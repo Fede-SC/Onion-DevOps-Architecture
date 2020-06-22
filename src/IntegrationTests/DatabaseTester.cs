@@ -3,6 +3,8 @@ using StructureMap;
 
 namespace ClearMeasure.OnionDevOpsArchitecture.IntegrationTests
 {
+    // Cassetto di Utility che va a pulire il database in maniera tale che ogni volta che io eseguo il ExpenseReportMappingTester non ho dati sporchi
+    // appesi nel db
     public class DatabaseTester
     {
         private static bool _dependenciesRegistered;

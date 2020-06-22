@@ -7,6 +7,8 @@ namespace ClearMeasure.OnionDevOpsArchitecture.Core
     //Some code adapted from Mediatr (https://github.com/jbogard/MediatR)
     public delegate object SingleInstanceFactory(Type serviceType);
 
+    // C'è una prima implementazione perché questo applicativo sostanzialmente gestisce tutte le richieste tramite messaggi
+    // L'applicativo spedisce una richiesta, una qualche richiesta che poi verrà gestita sulla base di che cosa è la richiesta. 
     public partial class Bus
     {
         private readonly SingleInstanceFactory _singleInstanceFactory;
@@ -22,17 +24,24 @@ namespace ClearMeasure.OnionDevOpsArchitecture.Core
             _telemetrySink = telemetrySink;
         }
 
+        // Ricevere una request ed eseguire correttamente il comando giusto sulla base della request che ho ricevuto
+        // Quindi mi è arrivata la richiesta di eseguire un comando
         public virtual TResponse Send<TResponse>(IRequest<TResponse> request)
         {
             Trace.WriteLine(message: string.Format("Message sent: {0}", request.GetType().FullName));
+            // Con la reflection viene creato in maniera dinamica il giusto oggetto per gestire questa richiesta
             var defaultHandler = GetHandler(request);
 
+            // Una volta che ho l'oggetto che gestisce la richiesta eseguo il comando e lo passo al mio chiamante per poter gestire l'esecuzione
             var result = defaultHandler.Handle(request);
+            // Primo richiamo alla telemetria. Voglio che la telemetria tenga traccia che è stata fatta la request con questi specifici dati ma non mi
+            // interessa di come è implementata e quindi la richiamo solo
             _telemetrySink.RecordCall<TResponse>(request, result);
 
             return result;
         }
 
+        // Con la reflection viene creato in maniera dinamica il giusto oggetto per gestire questa richiesta
         private RequestHandler<TResponse> GetHandler<TResponse>(IRequest<TResponse> request)
         {
             var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
