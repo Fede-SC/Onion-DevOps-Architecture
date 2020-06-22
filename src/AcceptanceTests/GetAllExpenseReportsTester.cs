@@ -4,7 +4,7 @@ using System.Reflection;
 using ClearMeasure.OnionDevOpsArchitecture.Core.Model;
 using ClearMeasure.OnionDevOpsArchitecture.IntegrationTests;
 using NUnit.Framework;
-using OpenQA.Selenium;
+using OpenQA.Selenium; // Libreiria che offre comandi di C# che permettono di fare dei robo test
 using OpenQA.Selenium.Chrome;
 using Shouldly;
 
@@ -39,6 +39,7 @@ namespace ClearMeasure.OnionDevOpsArchitecture.AcceptanceTests
         [TestCase("100000", TestName = "Should add new expense report numbered '100000'")]
         public void ShouldBeAbleToAddNewExpenseReport(string expenseReportNumber)
         {
+            // Provare un elemento con il nome richiesto, cliccarlo
             void ClickLink(string linkText)
             {
                 _driver.FindElement(By.LinkText(linkText)).Click();
@@ -50,10 +51,11 @@ namespace ClearMeasure.OnionDevOpsArchitecture.AcceptanceTests
                 numberTextBox.SendKeys(text);
             }
 
+            // Provocare eventi a livelli di browser
             Console.WriteLine($"Navigating to {_appUrl}");
-            _driver.Navigate().GoToUrl(_appUrl + "/");
-            _driver.Manage().Window.Maximize();
-            TakeScreenshot($"{expenseReportNumber}-Step1Arrange");
+            _driver.Navigate().GoToUrl(_appUrl + "/"); // Andare ad un url
+            _driver.Manage().Window.Maximize(); // Espandere la finestra 
+            TakeScreenshot($"{expenseReportNumber}-Step1Arrange"); // Fare uno screenshot per fare una prova grafica per verificare se è andato tutto bene
 
             ClickLink("Add New");
             
@@ -67,6 +69,7 @@ namespace ClearMeasure.OnionDevOpsArchitecture.AcceptanceTests
 
             TakeScreenshot($"{expenseReportNumber}-Step3Assert");
 
+            // Estrapolare valori presenti in una determinata area della pagina html per verificare che sono quelli che mi aspetto
             var numberCells = _driver.FindElements(
                 By.CssSelector($"td[data-expensereport-property=\"{nameof(ExpenseReport.Number)}\"][data-value=\"{expenseReportNumber}\"]"));
             numberCells.Count.ShouldBeGreaterThan(0);
